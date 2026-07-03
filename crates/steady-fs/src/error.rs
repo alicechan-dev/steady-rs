@@ -46,6 +46,16 @@ pub enum Error {
         source: std::io::Error,
     },
 
+    #[error("failed to clean directory `{path}`")]
+    CleanDir {
+        path: PathBuf,
+        #[source]
+        source: std::io::Error,
+    },
+
+    #[error("refusing to clean dangerous directory `{path}`")]
+    DangerousCleanDir { path: PathBuf },
+
     #[error("path `{path}` has no parent directory")]
     MissingParent { path: PathBuf },
 }
