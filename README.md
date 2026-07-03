@@ -55,6 +55,13 @@ The goal is not to hide filesystem behavior. The goal is to make common intent e
 - [steady-fs cookbook](docs/steady-fs-cookbook.md)
 - [steady-fs examples](crates/steady-fs/examples/)
 
+## Project docs
+
+- [Changelog](CHANGELOG.md)
+- [steady-fs cookbook](docs/steady-fs-cookbook.md)
+- [Release checklist](docs/release-checklist.md)
+- [steady-fs README](crates/steady-fs/README.md)
+
 ## Intended workspace structure
 
 ```txt

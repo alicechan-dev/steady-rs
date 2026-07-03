@@ -107,3 +107,9 @@ cargo run -p steady-fs --example move_file
 ## Status
 
 Early implementation. The API is useful, but still pre-1.0 and expected to stay conservative.
+
+## Release status
+
+`steady-fs` is currently preparing for its first `0.1.0` release.
+
+The API is usable for experimentation, but the crate should still be treated as early-stage until published and tested in real projects.
