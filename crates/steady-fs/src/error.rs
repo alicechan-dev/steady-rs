@@ -53,6 +53,14 @@ pub enum Error {
         source: std::io::Error,
     },
 
+    #[error("failed to copy file from `{from}` to `{to}`")]
+    CopyFile {
+        from: PathBuf,
+        to: PathBuf,
+        #[source]
+        source: std::io::Error,
+    },
+
     #[error("refusing to clean dangerous directory `{path}`")]
     DangerousCleanDir { path: PathBuf },
 
