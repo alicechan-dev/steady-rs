@@ -110,6 +110,4 @@ Early implementation. The API is useful, but still pre-1.0 and expected to stay 
 
 ## Release status
 
-`steady-fs` is currently preparing for its first `0.1.0` release.
-
-The API is usable for experimentation, but the crate should still be treated as early-stage until published and tested in real projects.
+`steady-fs` is in early `0.1.x` development. The API is usable, but still early and may evolve before `1.0`.

@@ -29,3 +29,10 @@
 - Check the crate page on crates.io
 - Check the generated documentation on docs.rs
 - Create a Git tag, for example `steady-fs-v0.1.0`
+
+## After release
+
+- Confirm crates.io page is live.
+- Confirm docs.rs build is successful.
+- Push Git tag.
+- Start next development version when needed.
