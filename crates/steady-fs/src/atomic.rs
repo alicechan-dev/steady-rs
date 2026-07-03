@@ -1,3 +1,4 @@
+use std::ffi::OsString;
 use std::io::Write;
 use std::path::{Path, PathBuf};
 
@@ -13,6 +14,9 @@ where
         data: data.as_ref().to_vec(),
         create_parent_dirs: false,
         overwrite: true,
+        backup_existing: false,
+        backup_suffix: ".bak".to_owned(),
+        dry_run: false,
     }
 }
 
@@ -22,6 +26,9 @@ pub struct AtomicWrite {
     data: Vec<u8>,
     create_parent_dirs: bool,
     overwrite: bool,
+    backup_existing: bool,
+    backup_suffix: String,
+    dry_run: bool,
 }
 
 impl AtomicWrite {
@@ -35,12 +42,31 @@ impl AtomicWrite {
         self
     }
 
+    pub fn backup_existing(mut self, backup_existing: bool) -> Self {
+        self.backup_existing = backup_existing;
+        self
+    }
+
+    pub fn backup_suffix(mut self, backup_suffix: impl Into<String>) -> Self {
+        self.backup_suffix = backup_suffix.into();
+        self
+    }
+
+    pub fn dry_run(mut self, dry_run: bool) -> Self {
+        self.dry_run = dry_run;
+        self
+    }
+
     pub fn write(self) -> Result<()> {
         if !self.overwrite && self.path.exists() {
             return Err(Error::AlreadyExists { path: self.path });
         }
 
         let parent = self.parent()?;
+
+        if self.dry_run {
+            return Ok(());
+        }
 
         if self.create_parent_dirs {
             std::fs::create_dir_all(parent).map_err(|source| Error::CreateParentDir {
@@ -78,6 +104,15 @@ impl AtomicWrite {
                 source,
             })?;
 
+        if self.backup_existing && self.path.exists() {
+            let backup_path = self.backup_path();
+            std::fs::copy(&self.path, &backup_path).map_err(|source| Error::Backup {
+                path: self.path.clone(),
+                backup_path,
+                source,
+            })?;
+        }
+
         let temp_path = temp.path().to_path_buf();
         temp.persist(&self.path).map_err(|err| Error::PersistTemp {
             temp_path,
@@ -92,5 +127,11 @@ impl AtomicWrite {
         self.path.parent().ok_or_else(|| Error::MissingParent {
             path: self.path.clone(),
         })
+    }
+
+    fn backup_path(&self) -> PathBuf {
+        let mut path = OsString::from(self.path.as_os_str());
+        path.push(&self.backup_suffix);
+        PathBuf::from(path)
     }
 }

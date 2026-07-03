@@ -38,6 +38,14 @@ pub enum Error {
     #[error("refusing to overwrite existing file `{path}`")]
     AlreadyExists { path: PathBuf },
 
+    #[error("failed to backup existing file `{path}` to `{backup_path}`")]
+    Backup {
+        path: PathBuf,
+        backup_path: PathBuf,
+        #[source]
+        source: std::io::Error,
+    },
+
     #[error("path `{path}` has no parent directory")]
     MissingParent { path: PathBuf },
 }
