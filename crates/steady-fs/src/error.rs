@@ -61,6 +61,14 @@ pub enum Error {
         source: std::io::Error,
     },
 
+    #[error("failed to move file from `{from}` to `{to}`")]
+    MoveFile {
+        from: PathBuf,
+        to: PathBuf,
+        #[source]
+        source: std::io::Error,
+    },
+
     #[error("refusing to clean dangerous directory `{path}`")]
     DangerousCleanDir { path: PathBuf },
 
