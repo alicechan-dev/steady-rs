@@ -1,8 +1,12 @@
-use std::ffi::OsString;
 use std::path::{Path, PathBuf};
 
+use crate::backup::backup_path_for;
 use crate::{Error, Result};
 
+/// Starts a file copy from `from` to `to`.
+///
+/// This helper copies a single file only. It does not recursively copy
+/// directories.
 pub fn copy_file<P, Q>(from: P, to: Q) -> CopyFile
 where
     P: AsRef<Path>,
@@ -19,6 +23,10 @@ where
     }
 }
 
+/// Builder for [`copy_file`].
+///
+/// By default, parent directories are not created, existing files may be
+/// overwritten, backups are disabled, and dry-run mode is disabled.
 #[derive(Debug, Clone)]
 pub struct CopyFile {
     from: PathBuf,
@@ -31,31 +39,37 @@ pub struct CopyFile {
 }
 
 impl CopyFile {
+    /// Sets whether missing parent directories for the destination should be created.
     pub fn create_parent_dirs(mut self, create_parent_dirs: bool) -> Self {
         self.create_parent_dirs = create_parent_dirs;
         self
     }
 
+    /// Sets whether an existing destination file may be overwritten.
     pub fn overwrite(mut self, overwrite: bool) -> Self {
         self.overwrite = overwrite;
         self
     }
 
+    /// Sets whether an existing destination file should be backed up first.
     pub fn backup_existing(mut self, backup_existing: bool) -> Self {
         self.backup_existing = backup_existing;
         self
     }
 
+    /// Sets the suffix appended to the destination path for backups.
     pub fn backup_suffix(mut self, backup_suffix: impl Into<String>) -> Self {
         self.backup_suffix = backup_suffix.into();
         self
     }
 
+    /// Sets whether the operation should validate policy but skip filesystem writes.
     pub fn dry_run(mut self, dry_run: bool) -> Self {
         self.dry_run = dry_run;
         self
     }
 
+    /// Copies the source file to the destination and returns the copied byte count.
     pub fn run(self) -> Result<u64> {
         if !self.overwrite && self.to.exists() {
             return Err(Error::AlreadyExists { path: self.to });
@@ -98,8 +112,6 @@ impl CopyFile {
     }
 
     fn backup_path(&self) -> PathBuf {
-        let mut path = OsString::from(self.to.as_os_str());
-        path.push(&self.backup_suffix);
-        PathBuf::from(path)
+        backup_path_for(&self.to, &self.backup_suffix)
     }
 }

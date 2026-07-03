@@ -2,6 +2,10 @@ use std::path::{Component, Path, PathBuf};
 
 use crate::{Error, Result};
 
+/// Starts a directory clean operation for `path`.
+///
+/// Cleaning removes the directory contents while leaving the directory itself
+/// in place.
 pub fn clean_dir<P>(path: P) -> CleanDir
 where
     P: AsRef<Path>,
@@ -12,6 +16,7 @@ where
     }
 }
 
+/// Builder for [`clean_dir`].
 #[derive(Debug, Clone)]
 pub struct CleanDir {
     path: PathBuf,
@@ -19,11 +24,13 @@ pub struct CleanDir {
 }
 
 impl CleanDir {
+    /// Sets whether the operation should validate guardrails but skip filesystem changes.
     pub fn dry_run(mut self, dry_run: bool) -> Self {
         self.dry_run = dry_run;
         self
     }
 
+    /// Removes the contents of the directory.
     pub fn run(self) -> Result<()> {
         if is_dangerous_path(&self.path) {
             return Err(Error::DangerousCleanDir { path: self.path });

@@ -1,6 +1,7 @@
 //! Small, boring, reliable filesystem helpers for Rust CLI tools and developer apps.
 
 mod atomic;
+mod backup;
 mod clean;
 mod copy;
 mod dir;

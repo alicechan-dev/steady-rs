@@ -1,9 +1,13 @@
-use std::ffi::OsString;
 use std::io::Write;
 use std::path::{Path, PathBuf};
 
+use crate::backup::backup_path_for;
 use crate::{Error, Result};
 
+/// Starts an atomic-style file write to `path`.
+///
+/// The data is written to a temporary file in the destination directory and
+/// then persisted to the final path when [`AtomicWrite::write`] is called.
 pub fn atomic_write<P, D>(path: P, data: D) -> AtomicWrite
 where
     P: AsRef<Path>,
@@ -20,6 +24,10 @@ where
     }
 }
 
+/// Builder for [`atomic_write`].
+///
+/// By default, parent directories are not created, existing files may be
+/// overwritten, backups are disabled, and dry-run mode is disabled.
 #[derive(Debug, Clone)]
 pub struct AtomicWrite {
     path: PathBuf,
@@ -32,31 +40,37 @@ pub struct AtomicWrite {
 }
 
 impl AtomicWrite {
+    /// Sets whether missing parent directories should be created.
     pub fn create_parent_dirs(mut self, create_parent_dirs: bool) -> Self {
         self.create_parent_dirs = create_parent_dirs;
         self
     }
 
+    /// Sets whether an existing destination file may be overwritten.
     pub fn overwrite(mut self, overwrite: bool) -> Self {
         self.overwrite = overwrite;
         self
     }
 
+    /// Sets whether an existing destination file should be backed up first.
     pub fn backup_existing(mut self, backup_existing: bool) -> Self {
         self.backup_existing = backup_existing;
         self
     }
 
+    /// Sets the suffix appended to the destination path for backups.
     pub fn backup_suffix(mut self, backup_suffix: impl Into<String>) -> Self {
         self.backup_suffix = backup_suffix.into();
         self
     }
 
+    /// Sets whether the operation should validate policy but skip filesystem writes.
     pub fn dry_run(mut self, dry_run: bool) -> Self {
         self.dry_run = dry_run;
         self
     }
 
+    /// Writes the data to the destination path.
     pub fn write(self) -> Result<()> {
         if !self.overwrite && self.path.exists() {
             return Err(Error::AlreadyExists { path: self.path });
@@ -130,8 +144,6 @@ impl AtomicWrite {
     }
 
     fn backup_path(&self) -> PathBuf {
-        let mut path = OsString::from(self.path.as_os_str());
-        path.push(&self.backup_suffix);
-        PathBuf::from(path)
+        backup_path_for(&self.path, &self.backup_suffix)
     }
 }

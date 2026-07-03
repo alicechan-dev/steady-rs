@@ -4,7 +4,7 @@ Small, boring, reliable filesystem helpers for Rust CLI tools and developer apps
 
 `steady-fs` does not replace `std::fs`. It wraps common error-prone filesystem workflows into safer, clearer helpers.
 
-This crate is currently in the design and documentation phase. The examples below describe the intended API.
+The crate is intentionally small. It currently focuses on common file and directory operations used by CLI tools, build scripts, code generators, and developer apps.
 
 ## Before
 
@@ -30,7 +30,7 @@ atomic_write("output/report.txt", data)
     .write()?;
 ```
 
-## Intended MVP API
+## API
 
 ```rust
 use steady_fs::prelude::*;
@@ -42,20 +42,27 @@ clean_dir("target/tmp").run()?;
 atomic_write("output/report.txt", data)
     .create_parent_dirs(true)
     .backup_existing(true)
+    .backup_suffix(".bak")
+    .dry_run(false)
     .write()?;
 
 copy_file("config.toml", "backup/config.toml")
     .create_parent_dirs(true)
     .overwrite(false)
+    .backup_existing(false)
+    .dry_run(false)
     .run()?;
 
 move_file("download.tmp", "archive/download.txt")
     .create_parent_dirs(true)
     .overwrite(false)
+    .backup_existing(false)
+    .dry_run(false)
+    .fallback_copy_delete(true)
     .run()?;
 ```
 
-## Intended features
+## Features
 
 - `atomic_write`
 - `ensure_dir`
@@ -65,6 +72,14 @@ move_file("download.tmp", "archive/download.txt")
 - backup-before-overwrite
 - dry-run mode
 - path-aware errors
+
+## Notes
+
+`atomic_write` writes through a temporary file in the destination directory and persists it to the final path. It avoids promising perfect crash-proof behavior on every filesystem.
+
+`clean_dir` removes the contents of a directory while leaving the directory itself in place. It refuses obviously dangerous paths such as roots, `.`, and paths containing `..`.
+
+`copy_file` and `move_file` operate on files only. They do not recursively copy or move directories.
 
 ## Non-goals
 
@@ -78,4 +93,4 @@ move_file("download.tmp", "archive/download.txt")
 
 ## Status
 
-Design first. Implementation comes after the API shape, error model, and platform behavior are clear.
+Early implementation. The API is useful, but still pre-1.0 and expected to stay conservative.
