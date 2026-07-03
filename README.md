@@ -4,8 +4,6 @@
 
 The first crate is `steady-fs`: boring, reliable filesystem helpers for common file operations that are easy to get almost right and annoying to debug when they fail.
 
-This project is currently in the design and documentation phase. The public API shown here is a proposal, not a finished implementation.
-
 ## Philosophy
 
 - Keep the API small.
@@ -51,6 +49,12 @@ atomic_write("output/report.txt", data)
 
 The goal is not to hide filesystem behavior. The goal is to make common intent explicit.
 
+## Documentation
+
+- [steady-fs crate README](crates/steady-fs/README.md)
+- [steady-fs cookbook](docs/steady-fs-cookbook.md)
+- [steady-fs examples](crates/steady-fs/examples/)
+
 ## Intended workspace structure
 
 ```txt
@@ -79,4 +83,4 @@ steady-rs/
 
 ## Status
 
-Design and documentation first. Implementation is intentionally deferred until the API shape, error model, and platform promises are boring enough to trust.
+Early implementation. `steady-fs` has working helpers for directory creation, directory cleaning, atomic-style writes, file copies, and file moves.

@@ -6,6 +6,8 @@ Small, boring, reliable filesystem helpers for Rust CLI tools and developer apps
 
 The crate is intentionally small. It currently focuses on common file and directory operations used by CLI tools, build scripts, code generators, and developer apps.
 
+For more task-oriented snippets, see the [steady-fs cookbook](../../docs/steady-fs-cookbook.md). Runnable examples live in [`examples/`](examples/).
+
 ## Before
 
 ```rust
@@ -72,6 +74,17 @@ move_file("download.tmp", "archive/download.txt")
 - backup-before-overwrite
 - dry-run mode
 - path-aware errors
+
+## Examples
+
+Run the example programs with Cargo:
+
+```bash
+cargo run -p steady-fs --example atomic_write
+cargo run -p steady-fs --example clean_dir
+cargo run -p steady-fs --example copy_file
+cargo run -p steady-fs --example move_file
+```
 
 ## Notes
 
